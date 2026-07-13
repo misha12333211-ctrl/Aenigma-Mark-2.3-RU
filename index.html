@@ -9,7 +9,6 @@
             --bg-color: #040406;
             --card-bg: #09090b;
             --accent: #00ff66;
-            --accent-dim: #003311;
             --error: #ef4444;
             --text-main: #f3f4f6;
             --text-muted: #4b5563;
@@ -38,7 +37,6 @@
         
         .btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 15px 40px; cursor: pointer; font-weight: bold; letter-spacing: 3px; transition: all 0.3s; font-size: 0.9rem; }
         .btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px rgba(0, 255, 102, 0.5); }
-        .btn:disabled { border-color: var(--text-muted); color: var(--text-muted); cursor: not-allowed; }
 
         .shake { animation: shake 0.4s ease-in-out; border-color: var(--error) !important; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
@@ -50,46 +48,47 @@
 
     <header>
         <div class="stats">SYSTEM: <strong style="color: #fff;">MEMORIA_M24</strong></div>
-        <div class="stats">ЛИМИТ ОШИБОК: <strong id="error-counter" style="color: var(--error);">0</strong>/5</div>
+        <div class="stats">ERROR MATRIX: <strong id="error-counter" style="color: var(--error);">0</strong>/5</div>
     </header>
 
     <main>
-        <!-- СТАРТ -->
         <div id="start-screen" class="screen active">
             <h1>MEMORIA <span style="color: var(--accent);">[MARK 24]</span></h1>
-            <p>Добро пожаловать в модуль детекции когнитивных искажений. Перед вами 24 уровня технологического превосходства. Ваша задача — находить структурные аномалии в СЕКТОРЕ Б, сравнивая его с чистым эталоном в СЕКТОРЕ А. С каждым слоем защита усложняется: статика сменяется кинетическими вихрями, пульсацией и привязкой к системным часам. Удачи.</p>
-            <button class="btn" onclick="initModule()">ЗАПУСТИТЬ СКАНИРОВАНИЕ</button>
+            <p>Welcome to the Cognitive Distortion Detection Module. You are presented with 24 layers of architectural data streams. Your primary objective is to locate structural anomalies in SECTOR B by comparing it with the clean baseline template in SECTOR A. With each level, the system defenses escalate: static shifts turn into kinetic matrix orbits, high-frequency pulses, and server time-locks. Good luck.</p>
+            <button class="btn" onclick="initModule()">INITIALIZE SCAN</button>
         </div>
 
-        <!-- ИГРОВОЙ ПРОЦЕСС -->
         <div id="game-screen" class="screen">
             <h1 id="level-title">LAYER 01</h1>
-            <p id="level-desc">Загрузка структуры ядра данных...</p>
+            <p id="level-desc">Loading core data structure streams...</p>
 
             <div class="matrix-wrapper">
                 <div class="matrix-box">
-                    <div class="matrix-label">СЕКТОР А // ORIGINAL</div>
+                    <div class="matrix-label">SECTOR A // ORIGINAL</div>
                     <canvas id="canvas-a" width="400" height="400"></canvas>
                 </div>
                 <div class="matrix-box">
-                    <div class="matrix-label" id="label-b">СЕКТОР Б // ANOMALY</div>
+                    <div class="matrix-label" id="label-b">SECTOR B // ANOMALY</div>
                     <canvas id="canvas-b" width="400" height="400"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- ПОБЕДНЫЙ ФИНАЛ -->
         <div id="victory-screen" class="screen">
             <h1 style="color: var(--accent);">GOD MODE ENGAGED</h1>
-            <p>Невероятно. Вы успешно прошли все 24 слоя когнитивного протокола «MEMORIA», обойдя динамические ловушки Hell Sector. Ваше внимание неуязвимо для машинных искажений.</p>
-            <button class="btn" onclick="window.location.reload()">ПЕРЕЗАПУСТИТЬ ЯДРО</button>
+            <p>Unbelievable. You conquered all 24 layers of the 'MEMORIA' protocol, successfully bypassing all dynamic cognitive traps of the Hell Sector. Your perception remains absolutely dominant over machine distortions.</p>
+            <button class="btn" onclick="window.location.reload()">REBOOT CORE</button>
         </div>
     </main>
 
     <footer>&copy; 2026 STANISLAV A. // COGNITIVE ANTI-AI INFRASTRUCTURE</footer>
 
     <script>
-        const API_URL = "http://localhost:3000"; // Измените адрес при деплое на хостинг
+        // Automatic host fallback logic to prevent loading deadlocks
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost:3000' 
+            : window.location.origin.replace('//file:', 'http://localhost:3000'); 
+
         let currentLevelIndex = 0;
         let errorCount = 0;
         let levelData = null;
@@ -122,18 +121,15 @@
                 document.getElementById('level-title').textContent = levelData.title;
                 document.getElementById('level-desc').textContent = levelData.desc;
                 
-                // Перезапуск цикла анимации/отрисовки графики на Canvas
                 tick();
             } catch (err) {
-                console.error("Критический сбой связи с ядром бэкенда", err);
+                document.getElementById('level-desc').innerHTML = "<span style='color:var(--error);'>CRITICAL INTERFACE ERROR: Cannot bind to server backend core. Ensure server.js is active on port 3000.</span>";
             }
         }
 
-        // Математический генератор абстрактных миров на базе Seed
         function drawMatrixGraphic(ctx, seed, isAnomalySector, timestamp) {
             ctx.clearRect(0, 0, 400, 400);
             
-            // Задний фон - матричный шум
             ctx.fillStyle = "rgba(0, 20, 5, 0.15)";
             for (let i = 0; i < 15; i++) {
                 let gx = Math.abs(Math.sin(seed + i)) * 400;
@@ -141,7 +137,6 @@
                 ctx.fillRect(gx, gy, 1, 15);
             }
 
-            // Основная геометрия объектов
             let nodesCount = 60;
             ctx.fillStyle = "#ffffff";
             ctx.strokeStyle = "rgba(255,255,255,0.2)";
@@ -149,7 +144,6 @@
 
             let anomalyX = 0, anomalyY = 0;
 
-            // Вычисляем координаты аномалии в зависимости от типа уровня
             if (levelData.type === "DYNAMIC_ORBIT") {
                 const angle = (timestamp / 1000) % (Math.PI * 2);
                 anomalyX = 200 + Math.sin(angle) * 100;
@@ -160,11 +154,9 @@
             }
 
             for (let i = 0; i < nodesCount; i++) {
-                // Псевдогенерация стабильных координат по зерну математики
                 let bx = Math.abs(Math.sin(seed * 1.5 + i)) * 320 + 40;
                 let by = Math.abs(Math.cos(seed * 2.8 + i)) * 320 + 40;
 
-                // Базовые статические связки
                 if (i > 0 && i % 4 === 0) {
                     ctx.beginPath();
                     ctx.moveTo(bx, by);
@@ -172,24 +164,20 @@
                     ctx.stroke();
                 }
 
-                // Элемент №23 выбран в качестве носителя аномалии на сервере
                 if (i === 23 && isAnomalySector) {
                     ctx.save();
-                    
-                    // Отрисовка согласно усложненным правилам уровня
                     switch (levelData.type) {
                         case "STATIC_COLOR":
-                            ctx.fillStyle = "#00ff66"; // Изменился цвет узла
+                            ctx.fillStyle = "#00ff66";
                             ctx.fillRect(215, 78, 8, 8);
                             break;
                         case "STATIC_DISPLACE":
-                            ctx.fillRect(142, 290, 7, 7); // Узел сдвинулся
+                            ctx.fillRect(142, 290, 7, 7);
                             break;
                         case "STATIC_SCALE":
-                            ctx.fillRect(310, 180, 15, 15); // Масштаб изменен
+                            ctx.fillRect(310, 180, 15, 15);
                             break;
                         case "STATIC_MISSING":
-                            // Ничего не рисуем, узел просто исчез!
                             break;
                         case "ROTATED_ANOMALY":
                             ctx.fillStyle = "#ff3333";
@@ -200,7 +188,6 @@
                             ctx.beginPath(); ctx.arc(anomalyX, anomalyY, 5, 0, Math.PI*2); ctx.fill();
                             break;
                         case "DYNAMIC_PULSE":
-                            // Появляется раз в 2 секунды
                             if (Math.floor(timestamp / 1000) % 2 === 0) {
                                 ctx.fillRect(130, 130, 6, 6);
                             }
@@ -210,14 +197,13 @@
                             ctx.fillRect(anomalyX, anomalyY, 7, 7);
                             break;
                         case "DYNAMIC_GLITCH":
-                            // Мерцание координат
                             let ox = 280 + (Math.random() * 6 - 3);
                             ctx.fillRect(ox, 140, 6, 6);
                             break;
                         case "DYNAMIC_VORTEX":
                             ctx.translate(200, 200);
                             ctx.rotate(timestamp * 0.001);
-                            ctx.fillRect(0, 0, 8, 8); // Истинный центр неподвижен на 200,200
+                            ctx.fillRect(0, 0, 8, 8);
                             break;
                         case "DYNAMIC_HOLD":
                             if (isHoldingMouseOnA) ctx.fillStyle = "#ff3333";
@@ -238,7 +224,6 @@
                     }
                     ctx.restore();
                 } else {
-                    // Рисуем дефолтные идентичные узлы для обоих секторов
                     if (levelData && levelData.type === "DYNAMIC_VORTEX" && isAnomalySector) {
                         ctx.save();
                         ctx.translate(200, 200);
@@ -246,9 +231,7 @@
                         ctx.fillRect(bx - 200, by - 200, 6, 6);
                         ctx.restore();
                     } else {
-                        // Стандартная ветка
                         if (levelData && levelData.type === "ROTATED_ANOMALY" && isAnomalySector) {
-                            // Отражение по вертикали для усложнения
                             ctx.fillRect(bx, 400 - by, 6, 6);
                         } else {
                             ctx.fillRect(bx, by, 6, 6);
@@ -260,20 +243,14 @@
 
         function tick(timestamp) {
             if (!levelData) return;
-            
-            // Рендерим Сектор А
             drawMatrixGraphic(ctxA, levelData.seed, false, timestamp);
-            // Рендерим Сектор Б
             drawMatrixGraphic(ctxB, levelData.seed, true, timestamp);
-
             animationFrameId = requestAnimationFrame(tick);
         }
 
-        // Фиксация удержания мыши на Секторе А для LAYER 21
         canvasA.addEventListener('mousedown', () => { isHoldingMouseOnA = true; });
         canvasA.addEventListener('mouseup', () => { isHoldingMouseOnA = false; });
 
-        // Логика клика по Сектору Б и отправка координат на валидацию сервера
         canvasB.addEventListener('click', async (e) => {
             const rect = canvasB.getBoundingClientRect();
             const scaleX = canvasB.width / rect.width;
@@ -301,7 +278,7 @@
                     handleError();
                 }
             } catch (err) {
-                console.error("Ошибка верификации клика", err);
+                console.error("Verification failed", err);
             }
         });
 
@@ -312,7 +289,7 @@
             setTimeout(() => canvasB.classList.remove('shake'), 400);
 
             if (errorCount >= 5) {
-                alert("КРИТИЧЕСКОЕ ИСКАЖЕНИЕ РАЗУМА. МОДУЛЬ ПЕРЕЗАПУСКАЕТСЯ.");
+                alert("CRITICAL COGNITIVE OVERLOAD. PROTOCOL REBOOTING.");
                 window.location.reload();
             }
         }
