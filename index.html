@@ -2,294 +2,399 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEMORIA // COGNITIVE MODULE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WORLD CLICK WAR</title>
     <style>
         :root {
-            --bg-color: #040406;
-            --card-bg: #09090b;
-            --accent: #00ff66;
-            --error: #ef4444;
-            --text-main: #f3f4f6;
-            --text-muted: #4b5563;
-            --border: #1f2937;
+            --bg: #000000; --accent: #ffffff; --muted: #666666; --border: #1c1c1e;
+            --panel: #0a0a0c; --green: #00ff66;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: "SF Mono", Consolas, monospace;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; -webkit-user-select: none; user-select: none; }
-        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 30px 15px; overflow-x: hidden; }
+        [data-theme="light"] {
+            --bg: #ffffff; --accent: #000000; --muted: #86868b; --border: #e5e5ea;
+            --panel: #f5f5f7; --green: #14803b;
+        }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body {
+            margin: 0; padding: 0; background: var(--bg); color: var(--accent);
+            font-family: var(--font); overflow-x: hidden; transition: background 0.2s;
+            display: flex; justify-content: center; min-height: 100vh;
+        }
+        .app-container {
+            width: 100%; max-width: 440px; min-height: 100vh;
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 24px; border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+            position: relative; background: var(--bg);
+        }
+        header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+        .logo-zone h1 { font-size: 14px; font-weight: 600; letter-spacing: 2px; margin: 0 0 4px 0; }
+        .season-badge { font-family: var(--font-mono); font-size: 10px; color: var(--muted); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; }
+        .online-count { font-family: var(--font-mono); font-size: 16px; font-weight: bold; }
+        .online-pulse { display: inline-block; width: 6px; height: 6px; background: var(--green); border-radius: 50%; margin-left: 4px; box-shadow: 0 0 8px var(--green); }
         
-        header { width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px; }
-        .stats { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px; }
-        .stats strong { color: var(--accent); }
+        .event-banner {
+            background: var(--accent); color: var(--bg); text-align: center; padding: 8px; font-size: 11px; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase; border-radius: 6px; margin: 16px 0 8px 0; display: none;
+        }
+        .leaderboard { flex-grow: 1; margin: 16px 0; overflow-y: auto; max-height: calc(100vh - 420px); padding-right: 4px; }
+        .leaderboard::-webkit-scrollbar { width: 4px; }
+        .leaderboard::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        
+        .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .row.current-user { font-weight: 600; color: var(--green); }
+        .row-left { display: flex; align-items: center; gap: 8px; }
+        .rank { font-family: var(--font-mono); color: var(--muted); width: 26px; font-size: 12px; }
+        .row-right { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); }
+        .speed-indicator { font-size: 11px; color: var(--green); opacity: 0.8; }
 
-        main { width: 100%; max-width: 900px; background: var(--card-bg); border: 1px solid var(--border); padding: 40px 20px; border-radius: 4px; box-shadow: 0 25px 60px rgba(0,0,0,0.8); text-align: center; position: relative; }
-        
-        .screen { display: none; }
-        .screen.active { display: block; }
-        
-        h1 { font-size: 1.6rem; letter-spacing: 5px; margin-bottom: 25px; color: #fff; }
-        p { color: #9ca3af; line-height: 1.8; margin-bottom: 30px; font-size: 0.95rem; text-align: justify; }
+        .live-feed-container { height: 32px; overflow: hidden; position: relative; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+        .live-feed { display: flex; gap: 16px; position: absolute; white-space: nowrap; }
+        .feed-item { font-size: 12px; font-family: var(--font-mono); color: var(--muted); background: var(--panel); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); }
 
-        .matrix-wrapper { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; margin-bottom: 30px; }
-        .matrix-box { display: flex; flex-direction: column; align-items: center; }
-        .matrix-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 2px; font-weight: bold; }
+        .control-panel { border-top: 1px solid var(--border); padding-top: 16px; text-align: center; }
+        .active-country-info { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+        .click-box { position: relative; display: inline-block; margin-bottom: 16px; }
         
-        canvas { background: #000000; border: 1px solid var(--border); box-shadow: 0 0 20px rgba(0,0,0,0.5); cursor: crosshair; max-width: 100%; height: auto; }
-        
-        .btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 15px 40px; cursor: pointer; font-weight: bold; letter-spacing: 3px; transition: all 0.3s; font-size: 0.9rem; }
-        .btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px rgba(0, 255, 102, 0.5); }
+        #click-btn {
+            width: 130px; height: 130px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent);
+            color: var(--accent); font-size: 15px; font-weight: 600; letter-spacing: 2px; cursor: pointer; transition: transform 0.05s;
+        }
+        #click-btn:active { transform: scale(0.94); }
+        #click-btn.premium-active { background: var(--accent); color: var(--bg); box-shadow: 0 0 30px rgba(255,255,255,0.15); }
 
-        .shake { animation: shake 0.4s ease-in-out; border-color: var(--error) !important; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
+        .particle { position: absolute; pointer-events: none; font-family: var(--font-mono); font-weight: bold; animation: floatParticle 0.5s ease-out forwards; left: 50%; }
+        @keyframes floatParticle { 0% { transform: translate(-50%, 0); opacity: 1; } 100% { transform: translate(-50%, -60px); opacity: 0; } }
 
-        footer { margin-top: auto; padding-top: 30px; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; }
+        .timer-val { color: var(--accent); font-weight: 600; font-size: 14px; margin-top: 2px; font-family: var(--font-mono); }
+        .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 100; display: flex; flex-direction: column; justify-content: center; padding: 40px 24px; }
+        .search-box { background: var(--panel); border: 1px solid var(--border); padding: 12px; border-radius: 8px; color: var(--accent); width: 100%; font-size: 15px; margin-bottom: 16px; }
+        .country-select-list { flex-grow: 1; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }
+        .select-row { display: flex; justify-content: space-between; padding: 14px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 15px; }
+        .select-row:hover { background: var(--panel); }
+        .hidden { display: none !important; }
+        .nav-links { display: flex; justify-content: center; gap: 16px; margin-top: 16px; font-size: 12px; color: var(--muted); cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="stats">SYSTEM: <strong style="color: #fff;">MEMORIA_M24</strong></div>
-        <div class="stats">TOTAL MISCLICKS: <strong id="error-counter" style="color: var(--error);">0</strong></div>
-    </header>
-
-    <main>
-        <div id="start-screen" class="screen active">
-            <h1>MEMORIA <span style="color: var(--accent);">[MARK 24]</span></h1>
-            <p>Welcome to the Cognitive Distortion Detection Module. You are presented with 24 layers of architectural data streams. Your primary objective is to locate structural anomalies in SECTOR B by comparing it with the clean baseline template in SECTOR A. With each level, the system defenses escalate: static shifts turn into kinetic matrix orbits, high-frequency pulses, and server time-locks. Good luck.</p>
-            <button class="btn" onclick="initModule()">INITIALIZE SCAN</button>
+    <div class="app-container">
+        <!-- ОКНО ВЫБОРА СТРАНЫ С ПОИСКОМ -->
+        <div id="welcome-modal" class="modal hidden">
+            <h2 style="font-weight:400; margin-bottom:10px; font-size:20px;">Select Country / Выберите страну</h2>
+            <input type="text" id="search-input" class="search-box" placeholder="Type country name to search...">
+            <div class="country-select-list" id="select-list"></div>
         </div>
 
-        <div id="game-screen" class="screen">
-            <h1 id="level-title">LAYER 01</h1>
-            <p id="level-desc">Loading core data structure streams...</p>
-
-            <div class="matrix-wrapper">
-                <div class="matrix-box">
-                    <div class="matrix-label">SECTOR A // ORIGINAL</div>
-                    <canvas id="canvas-a" width="400" height="400"></canvas>
-                </div>
-                <div class="matrix-box">
-                    <div class="matrix-label" id="label-b">SECTOR B // ANOMALY</div>
-                    <canvas id="canvas-b" width="400" height="400"></canvas>
+        <!-- ОПЦИИ -->
+        <div id="settings-modal" class="modal hidden">
+            <h2 style="font-weight:400;">Options</h2>
+            <div style="flex-grow:1;">
+                <button class="search-box" style="text-align:left;" onclick="toggleTheme()">🌓 Switch Theme</button>
+                <button class="search-box" style="text-align:left;" onclick="resetCountry()">🌍 Change Country</button>
+                <div style="border: 1px dashed var(--border); padding: 20px; border-radius: 8px; text-align: center; margin-top:30px;">
+                    <h3 style="margin:0 0 8px 0; font-weight:500;">❤️ Supporter Upgrade</h3>
+                    <p style="font-size:12px; color:var(--muted); margin-bottom:15px;">Unlock permanent x5 multiplier for your country.</p>
+                    <div id="memo-box" style="background:var(--panel); padding:8px; font-family:var(--font-mono); margin-bottom:12px; border-radius:4px;">GENERATING...</div>
+                    <button class="search-box" style="background:var(--accent); color:var(--bg); font-weight:600; margin:0;" onclick="simulatePayment()">Activate x5 Boost ($0.10)</button>
                 </div>
             </div>
+            <button class="search-box" style="background:none;" onclick="document.getElementById('settings-modal').classList.add('hidden')">Close</button>
         </div>
 
-        <div id="victory-screen" class="screen">
-            <h1 style="color: var(--accent);">GOD MODE ENGAGED</h1>
-            <p>Unbelievable. You conquered all 24 layers of the 'MEMORIA' protocol, successfully bypassing all dynamic cognitive traps of the Hell Sector. Your perception remains absolutely dominant over machine distortions.</p>
-            <button class="btn" onclick="window.location.reload()">REBOOT CORE</button>
-        </div>
-    </main>
+        <!-- ИГРОВОЙ ИНТЕРФЕЙС -->
+        <header>
+            <div class="logo-zone">
+                <h1>WORLD CLICK WAR</h1>
+                <span class="season-badge" id="season-badge">SEASON 1</span>
+            </div>
+            <div class="online-status">
+                <div class="online-count" id="online-val">0<span class="online-pulse"></span></div>
+            </div>
+        </header>
 
-    <footer>&copy; 2026 STANISLAV A. // COGNITIVE ANTI-AI INFRASTRUCTURE</footer>
+        <div class="event-banner" id="event-banner"></div>
+        <div class="leaderboard" id="leaderboard-box"></div>
+
+        <div class="live-feed-container">
+            <div class="live-feed" id="live-ticker"></div>
+        </div>
+
+        <div class="control-panel">
+            <div class="active-country-info" id="user-status">Fighting for --</div>
+            <div class="click-box">
+                <button id="click-btn">CLICK</button>
+            </div>
+            <div class="timer-zone">
+                <div style="font-size:10px; letter-spacing:1px;">NEXT SEASON IN</div>
+                <div class="timer-val" id="countdown">00:00:00</div>
+            </div>
+            <div class="nav-links"><span onclick="openSettings()">💎 Options & Boost</span></div>
+        </div>
+    </div>
 
     <script>
-        // Bound directly to your live Render server instance
-        const API_URL = "https://aenigma-server-ru.onrender.com"; 
+        // Полный справочник стран мира (ISO 3166-1)
+        const ALL_COUNTRIES = [
+            {code:"AF", name:"Afghanistan", flag:"🇦🇫"}, {code:"AL", name:"Albania", flag:"🇦🇱"}, {code:"DZ", name:"Algeria", flag:"🇩🇿"}, {code:"AD", name:"Andorra", flag:"🇦🇩"},
+            {code:"AO", name:"Angola", flag:"🇦🇴"}, {code:"AG", name:"Antigua and Barbuda", flag:"🇦🇬"}, {code:"AR", name:"Argentina", flag:"🇦🇷"}, {code:"AM", name:"Armenia", flag:"🇦🇲"},
+            {code:"AU", name:"Australia", flag:"🇦🇺"}, {code:"AT", name:"Austria", flag:"🇦🇹"}, {code:"AZ", name:"Azerbaijan", flag:"🇦🇿"}, {code:"BS", name:"Bahamas", flag:"🇧🇸"},
+            {code:"BH", name:"Bahrain", flag:"🇧🇭"}, {code:"BD", name:"Bangladesh", flag:"🇧🇩"}, {code:"BB", name:"Barbados", flag:"🇧🇧"}, {code:"BY", name:"Belarus", flag:"🇧🇾"},
+            {code:"BE", name:"Belgium", flag:"🇧🇪"}, {code:"BZ", name:"Belize", flag:"🇧🇿"}, {code:"BJ", name:"Benin", flag:"🇧🇯"}, {code:"BT", name:"Bhutan", flag:"🇧🇹"},
+            {code:"BO", name:"Bolivia", flag:"🇧🇴"}, {code:"BA", name:"Bosnia and Herzegovina", flag:"🇧🇦"}, {code:"BW", name:"Botswana", flag:"🇧🇼"}, {code:"BR", name:"Brazil", flag:"🇧🇷"},
+            {code:"BN", name:"Brunei", flag:"🇧🇳"}, {code:"BG", name:"Bulgaria", flag:"🇧🇬"}, {code:"BF", name:"Burkina Faso", flag:"🇧🇫"}, {code:"BI", name:"Burundi", flag:"🇧🇮"},
+            {code:"KH", name:"Cambodia", flag:"🇰🇭"}, {code:"CM", name:"Cameroon", flag:"🇨🇲"}, {code:"CA", name:"Canada", flag:"🇨🇦"}, {code:"CV", name:"Cape Verde", flag:"🇨🇻"},
+            {code:"CF", name:"Central African Republic", flag:"🇨🇫"}, {code:"TD", name:"Chad", flag:"🇹🇩"}, {code:"CL", name:"Chile", flag:"🇨🇱"}, {code:"CN", name:"China", flag:"🇨🇳"},
+            {code:"CO", name:"Colombia", flag:"🇨🇴"}, {code:"KM", name:"Comoros", flag:"🇰🇲"}, {code:"CG", name:"Congo", flag:"🇨🇬"}, {code:"CR", name:"Costa Rica", flag:"🇨🇷"},
+            {code:"HR", name:"Croatia", flag:"🇭🇷"}, {code:"CU", name:"Cuba", flag:"🇨🇺"}, {code:"CY", name:"Cyprus", flag:"🇨🇾"}, {code:"CZ", name:"Czech Republic", flag:"🇨🇿"},
+            {code:"DK", name:"Denmark", flag:"🇩🇰"}, {code:"DJ", name:"Djibouti", flag:"🇩🇯"}, {code:"DM", name:"Dominica", flag:"🇩🇲"}, {code:"DO", name:"Dominican Republic", flag:"🇩🇩"},
+            {code:"EC", name:"Ecuador", flag:"🇪🇨"}, {code:"EG", name:"Egypt", flag:"🇪🇬"}, {code:"SV", name:"El Salvador", flag:"🇸🇻"}, {code:"GQ", name:"Equatorial Guinea", flag:"🇬🇶"},
+            {code:"ER", name:"Eritrea", flag:"🇪🇷"}, {code:"EE", name:"Estonia", flag:"🇪🇪"}, {code:"SZ", name:"Eswatini", flag:"🇸🇿"}, {code:"ET", name:"Ethiopia", flag:"🇪🇹"},
+            {code:"FJ", name:"Fiji", flag:"🇫🇯"}, {code:"FI", name:"Finland", flag:"🇫🇮"}, {code:"FR", name:"France", flag:"🇫🇷"}, {code:"GA", name:"Gabon", flag:"🇬🇦"},
+            {code:"GM", name:"Gambia", flag:"🇬🇲"}, {code:"GE", name:"Georgia", flag:"🇬🇪"}, {code:"DE", name:"Germany", flag:"🇩🇪"}, {code:"GH", name:"Ghana", flag:"🇬🇭"},
+            {code:"GR", name:"Greece", flag:"🇬🇷"}, {code:"GD", name:"Grenada", flag:"🇬🇩"}, {code:"GT", name:"Guatemala", flag:"🇬🇹"}, {code:"GN", name:"Guinea", flag:"🇬🇳"},
+            {code:"GW", name:"Guinea-Bissau", flag:"🇬🇼"}, {code:"GY", name:"Guyana", flag:"🇬🇾"}, {code:"HT", name:"Haiti", flag:"🇭🇹"}, {code:"HN", name:"Honduras", flag:"🇭🇳"},
+            {code:"HU", name:"Hungary", flag:"🇭🇺"}, {code:"IS", name:"Iceland", flag:"🇮🇸"}, {code:"IN", name:"India", flag:"🇮🇳"}, {code:"ID", name:"Indonesia", flag:"🇮🇩"},
+            {code:"IR", name:"Iran", flag:"🇮🇷"}, {code:"IQ", name:"Iraq", flag:"🇮🇶"}, {code:"IE", name:"Ireland", flag:"🇮🇪"}, {code:"IL", name:"Israel", flag:"🇮🇱"},
+            {code:"IT", name:"Italy", flag:"🇮🇹"}, {code:"JM", name:"Jamaica", flag:"🇯🇲"}, {code:"JP", name:"Japan", flag:"🇯🇵"}, {code:"JO", name:"Jordan", flag:"🇯🇴"},
+            {code:"KZ", name:"Kazakhstan", flag:"🇰🇿"}, {code:"KE", name:"Kenya", flag:"🇰🇪"}, {code:"KI", name:"Kiribati", flag:"🇰🇮"}, {code:"KP", name:"North Korea", flag:"🇰🇵"},
+            {code:"KR", name:"South Korea", flag:"🇰🇷"}, {code:"KW", name:"Kuwait", flag:"🇰🇼"}, {code:"KG", name:"Kyrgyzstan", flag:"🇰🇬"}, {code:"LA", name:"Laos", flag:"🇱🇦"},
+            {code:"LV", name:"Latvia", flag:"🇱🇻"}, {code:"LB", name:"Lebanon", flag:"🇱🇧"}, {code:"LS", name:"Lesotho", flag:"🇱🇸"}, {code:"LR", name:"Liberia", flag:"🇱🇷"},
+            {code:"LY", name:"Libya", flag:"🇱🇾"}, {code:"LI", name:"Liechtenstein", flag:"🇱🇮"}, {code:"LT", name:"Lithuania", flag:"🇱🇹"}, {code:"LU", name:"Luxembourg", flag:"🇱🇺"},
+            {code:"MG", name:"Madagascar", flag:"🇲🇬"}, {code:"MW", name:"Malawi", flag:"🇲🇼"}, {code:"MY", name:"Malaysia", flag:"🇲🇾"}, {code:"MV", name:"Maldives", flag:"🇲🇻"},
+            {code:"ML", name:"Mali", flag:"🇲🇱"}, {code:"MT", name:"Malta", flag:"🇲🇹"}, {code:"MH", name:"Marshall Islands", flag:"🇲🇭"}, {code:"MR", name:"Mauritania", flag:"🇲🇷"},
+            {code:"MU", name:"Mauritius", flag:"🇲🇺"}, {code:"MX", name:"Mexico", flag:"🇲🇽"}, {code:"FM", name:"Micronesia", flag:"🇫🇲"}, {code:"MD", name:"Moldova", flag:"🇲🇩"},
+            {code:"MC", name:"Monaco", flag:"🇲🇨"}, {code:"MN", name:"Mongolia", flag:"🇲🇳"}, {code:"ME", name:"Montenegro", flag:"🇲🇪"}, {code:"MA", name:"Morocco", flag:"🇲🇦"},
+            {code:"MZ", name:"Mozambique", flag:"🇲🇿"}, {code:"MM", name:"Myanmar", flag:"🇲🇲"}, {code:"NA", name:"Namibia", flag:"🇳🇦"}, {code:"NR", name:"Nauru", flag:"🇳🇷"},
+            {code:"NP", name:"Nepal", flag:"🇳🇵"}, {code:"NL", name:"Netherlands", flag:"🇳🇱"}, {code:"NZ", name:"New Zealand", flag:"🇳🇿"}, {code:"NI", name:"Nicaragua", flag:"🇳🇮"},
+            {code:"NE", name:"Niger", flag:"🇳🇪"}, {code:"NG", name:"Nigeria", flag:"🇳🇬"}, {code:"MK", name:"North Macedonia", flag:"🇲🇰"}, {code:"NO", name:"Norway", flag:"🇳🇴"},
+            {code:"OM", name:"Oman", flag:"🇴🇲"}, {code:"PK", name:"Pakistan", flag:"🇵🇰"}, {code:"PW", name:"Palau", flag:"🇵🇼"}, {code:"PA", name:"Panama", flag:"🇵🇦"},
+            {code:"PG", name:"Papua New Guinea", flag:"🇵🇬"}, {code:"PY", name:"Paraguay", flag:"🇵🇾"}, {code:"PE", name:"Peru", flag:"🇵🇪"}, {code:"PH", name:"Philippines", flag:"🇵🇭"},
+            {code:"PL", name:"Poland", flag:"🇵🇱"}, {code:"PT", name:"Portugal", flag:"🇵🇹"}, {code:"QA", name:"Qatar", flag:"🇶🇦"}, {code:"RO", name:"Romania", flag:"🇷🇴"},
+            {code:"RU", name:"Russia", flag:"🇷🇺"}, {code:"RW", name:"Rwanda", flag:"🇷🇼"}, {code:"KN", name:"Saint Kitts and Nevis", flag:"🇰🇳"}, {code:"LC", name:"Saint Lucia", flag:"🇱🇨"},
+            {code:"VC", name:"Saint Vincent", flag:"🇻🇨"}, {code:"WS", name:"Samoa", flag:"🇼🇸"}, {code:"SM", name:"San Marino", flag:"🇸🇲"}, {code:"ST", name:"Sao Tome", flag:"🇸🇹"},
+            {code:"SA", name:"Saudi Arabia", flag:"🇸🇦"}, {code:"SN", name:"Senegal", flag:"🇸🇳"}, {code:"RS", name:"Serbia", flag:"🇷🇸"}, {code:"SC", name:"Seychelles", flag:"🇸🇨"},
+            {code:"SL", name:"Sierra Leone", flag:"🇸🇱"}, {code:"SG", name:"Singapore", flag:"🇸🇬"}, {code:"SK", name:"Slovakia", flag:"🇸🇰"}, {code:"SI", name:"Slovenia", flag:"🇸🇮"},
+            {code:"SB", name:"Solomon Islands", flag:"🇸🇧"}, {code:"SO", name:"Somalia", flag:"🇸🇴"}, {code:"ZA", name:"South Africa", flag:"🇿🇦"}, {code:"SS", name:"South Sudan", flag:"🇸🇸"},
+            {code:"ES", name:"Spain", flag:"🇪🇸"}, {code:"LK", name:"Sri Lanka", flag:"🇱🇰"}, {code:"SD", name:"Sudan", flag:"🇸🇩"}, {code:"SR", name:"Suriname", flag:"🇸🇷"},
+            {code:"SE", name:"Sweden", flag:"🇸🇪"}, {code:"CH", name:"Switzerland", flag:"🇨🇭"}, {code:"SY", name:"Syria", flag:"🇸🇾"}, {code:"TW", name:"Taiwan", flag:"🇹🇼"},
+            {code:"TJ", name:"Tajikistan", flag:"🇹🇯"}, {code:"TZ", name:"Tanzania", flag:"🇹🇿"}, {code:"TH", name:"Thailand", flag:"🇹🇭"}, {code:"TL", name:"Timor-Leste", flag:"🇹🇱"},
+            {code:"TG", name:"Togo", flag:"🇹🇬"}, {code:"TO", name:"Tonga", flag:"🇹🇴"}, {code:"TT", name:"Trinidad and Tobago", flag:"🇹🇹"}, {code:"TN", name:"Tunisia", flag:"🇹🇳"},
+            {code:"TR", name:"Turkey", flag:"🇹🇷"}, {code:"TM", name:"Turkmenistan", flag:"🇹🇲"}, {code:"TV", name:"Tuvalu", flag:"🇹🇻"}, {code:"UG", name:"Uganda", flag:"🇺🇬"},
+            {code:"UA", name:"Ukraine", flag:"🇺🇦"}, {code:"AE", name:"United Arab Emirates", flag:"🇦🇪"}, {code:"GB", name:"United Kingdom", flag:"🇬🇧"}, {code:"US", name:"United States", flag:"🇺🇸"},
+            {code:"UY", name:"Uruguay", flag:"🇺🇾"}, {code:"UZ", name:"Uzbekistan", flag:"🇺🇿"}, {code:"VU", name:"Vanuatu", flag:"🇻🇺"}, {code:"VE", name:"Venezuela", flag:"🇻🇪"},
+            {code:"VN", name:"Vietnam", flag:"🇻🇳"}, {code:"YE", name:"Yemen", flag:"🇾🇪"}, {code:"ZM", name:"Zambia", flag:"🇿🇲"}, {code:"ZW", name:"Zimbabwe", flag:"🇿🇼"}
+        ];
 
-        let currentLevelIndex = 0;
-        let errorCount = 0;
-        let levelData = null;
-        let animationFrameId = null;
-        let isHoldingMouseOnA = false;
+        let ws;
+        let serverCountries = [];
+        let userCountry = localStorage.getItem("war_country");
+        let isPremium = localStorage.getItem("war_premium") === "true";
+        
+        let localClickBuffer = [];
+        let packetInterval = null;
 
-        const canvasA = document.getElementById('canvas-a');
-        const canvasB = document.getElementById('canvas-b');
-        const ctxA = canvasA.getContext('2d');
-        const ctxB = canvasB.getContext('2d');
+        const leaderboardBox = document.getElementById("leaderboard-box");
+        const clickBtn = document.getElementById("click-btn");
+        const ticker = document.getElementById("live-ticker");
 
-        function initModule() {
-            document.getElementById('start-screen').classList.remove('active');
-            document.getElementById('game-screen').classList.add('active');
-            loadLevelFromServer();
-        }
+        function connect() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}`);
 
-        async function loadLevelFromServer() {
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            
-            try {
-                const response = await fetch(`${API_URL}/api/level?idx=${currentLevelIndex}`);
-                levelData = await response.json();
-
-                if (levelData.finished) {
-                    showVictory();
-                    return;
-                }
-
-                document.getElementById('level-title').textContent = levelData.title;
-                document.getElementById('level-desc').textContent = levelData.desc;
+            ws.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
                 
-                tick();
-            } catch (err) {
-                document.getElementById('level-desc').innerHTML = "<span style='color:var(--error);'>CRITICAL INTERFACE ERROR: Connection to Render backend core lost. Verify web service deployment status.</span>";
-            }
+                if (msg.type === "INIT" || msg.type === "TICK") {
+                    serverCountries = msg.countries;
+                    document.getElementById("online-val").innerHTML = `${msg.online.toLocaleString()}<span class="online-pulse"></span>`;
+                    updateTimer(msg.seasonTime);
+                    handleEventBanner(msg.event);
+                    renderLeaderboard();
+                }
+                
+                if (msg.type === "LIVE_FEED_EVENT") {
+                    pushToTicker(msg.country);
+                }
+
+                if (msg.type === "PREMIUM_ACTIVATED" && msg.memo === localStorage.getItem("payment_memo")) {
+                    activatePremium();
+                }
+            };
+
+            ws.onclose = () => setTimeout(connect, 2000);
         }
 
-        function drawMatrixGraphic(ctx, seed, isAnomalySector, timestamp) {
-            ctx.clearRect(0, 0, 400, 400);
+        function renderLeaderboard() {
+            leaderboardBox.innerHTML = '';
             
-            ctx.fillStyle = "rgba(0, 20, 5, 0.15)";
-            for (let i = 0; i < 15; i++) {
-                let gx = Math.abs(Math.sin(seed + i)) * 400;
-                let gy = (timestamp * (0.1 + i * 0.02)) % 400;
-                ctx.fillRect(gx, gy, 1, 15);
+            // Сортируем страны по очкам на сервере
+            serverCountries.sort((a,b) => b.score - a.score);
+            
+            serverCountries.forEach((c, index) => {
+                const isMe = c.code === userCountry;
+                const row = document.createElement("div");
+                row.className = `row ${isMe ? 'current-user' : ''}`;
+                
+                let rankVisual = index + 1;
+                if(rankVisual === 1) rankVisual = "🥇";
+                else if(rankVisual === 2) rankVisual = "🥈";
+                else if(rankVisual === 3) rankVisual = "🥉";
+
+                row.innerHTML = `
+                    <div class="row-left"><span class="rank">${rankVisual}</span><span>${c.flag} ${c.name}</span></div>
+                    <div class="row-right"><span>${c.score.toLocaleString()}</span><span class="speed-indicator">+${c.lastSpeed}/s</span></div>
+                `;
+                leaderboardBox.appendChild(row);
+            });
+        }
+
+        clickBtn.onclick = () => {
+            if (!userCountry) return;
+            
+            const match = serverCountries.find(c => c.code === userCountry);
+            if(match) { 
+                match.score += (isPremium ? 5 : 1); 
+                renderLeaderboard(); 
             }
 
-            let nodesCount = 60;
-            ctx.fillStyle = "#ffffff";
-            ctx.strokeStyle = "rgba(255,255,255,0.2)";
-            ctx.lineWidth = 1;
+            localClickTimelinePush();
 
-            let anomalyX = 0, anomalyY = 0;
+            const p = document.createElement("div");
+            p.className = "particle";
+            p.innerText = isPremium ? "+5 🔥" : "+1";
+            p.style.top = `20px`;
+            document.querySelector(".click-box").appendChild(p);
+            setTimeout(() => p.remove(), 500);
+        };
 
-            if (levelData.type === "DYNAMIC_ORBIT") {
-                const angle = (timestamp / 1000) % (Math.PI * 2);
-                anomalyX = 200 + Math.sin(angle) * 100;
-                anomalyY = 200 + Math.cos(angle) * 100;
-            } else if (levelData.type === "DYNAMIC_TIME" || levelData.type === "DYNAMIC_FINAL") {
-                anomalyX = 50 + (levelData.timeMinutes * 4) % 300;
-                anomalyY = 50 + (levelData.timeMinutes * 3) % 300;
-            }
-
-            for (let i = 0; i < nodesCount; i++) {
-                let bx = Math.abs(Math.sin(seed * 1.5 + i)) * 320 + 40;
-                let by = Math.abs(Math.cos(seed * 2.8 + i)) * 320 + 40;
-
-                if (i > 0 && i % 4 === 0) {
-                    ctx.beginPath();
-                    ctx.moveTo(bx, by);
-                    ctx.lineTo(200, 200);
-                    ctx.stroke();
-                }
-
-                if (i === 23 && isAnomalySector) {
-                    ctx.save();
-                    switch (levelData.type) {
-                        case "STATIC_COLOR":
-                            ctx.fillStyle = "#00ff66";
-                            ctx.fillRect(215 - 1, 78 - 1, 10, 10);
-                            break;
-                        case "STATIC_DISPLACE":
-                            ctx.fillRect(142, 290, 7, 7);
-                            break;
-                        case "STATIC_SCALE":
-                            ctx.fillRect(310 - 4, 180 - 4, 15, 15);
-                            break;
-                        case "STATIC_MISSING":
-                            break;
-                        case "ROTATED_ANOMALY":
-                            ctx.fillStyle = "#ff3333";
-                            ctx.fillRect(200 - 1, 90 - 1, 10, 10);
-                            break;
-                        case "DYNAMIC_ORBIT":
-                            ctx.fillStyle = "#00ff66";
-                            ctx.beginPath(); ctx.arc(anomalyX, anomalyY, 6, 0, Math.PI*2); ctx.fill();
-                            break;
-                        case "DYNAMIC_PULSE":
-                            if (Math.floor(timestamp / 1000) % 2 === 0) {
-                                ctx.fillRect(130, 130, 8, 8);
-                            }
-                            break;
-                        case "DYNAMIC_TIME":
-                            ctx.fillStyle = "#00ff66";
-                            ctx.fillRect(anomalyX, anomalyY, 8, 8);
-                            break;
-                        case "DYNAMIC_GLITCH":
-                            let ox = 280 + (Math.random() * 6 - 3);
-                            ctx.fillRect(ox, 140, 8, 8);
-                            break;
-                        case "DYNAMIC_VORTEX":
-                            ctx.translate(200, 200);
-                            ctx.rotate(timestamp * 0.001);
-                            ctx.fillRect(-4, -4, 8, 8);
-                            break;
-                        case "DYNAMIC_HOLD":
-                            if (isHoldingMouseOnA) ctx.fillStyle = "#ff3333";
-                            ctx.fillRect(100, 300, 8, 8);
-                            break;
-                        case "DYNAMIC_COLOR_LOOP":
-                            let hue = (timestamp / 10) % 360;
-                            ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
-                            ctx.fillRect(310, 320, 8, 8);
-                            break;
-                        case "DYNAMIC_PHANTOM":
-                            if (Math.random() < 0.05) ctx.fillRect(220, 110, 8, 8);
-                            break;
-                        case "DYNAMIC_FINAL":
-                            ctx.fillStyle = (Math.random() > 0.5) ? "#fff" : "#00ff66";
-                            ctx.fillRect(anomalyX + (Math.random()*4-2), anomalyY, 8, 8);
-                            break;
+        function localClickTimelinePush() {
+            localClickBuffer.push(Date.now());
+            if(!packetInterval) {
+                packetInterval = setTimeout(() => {
+                    if(ws.readyState === 1 && localClickBuffer.length > 0) {
+                        const staticData = ALL_COUNTRIES.find(c => c.code === userCountry) || {};
+                        ws.send(JSON.stringify({
+                            type: "CLICK_PACKET",
+                            country: userCountry,
+                            countryName: staticData.name,
+                            countryFlag: staticData.flag,
+                            timestamps: localClickBuffer,
+                            isPremiumUser: isPremium
+                        }));
                     }
-                    ctx.restore();
-                } else {
-                    if (levelData && levelData.type === "DYNAMIC_VORTEX" && isAnomalySector) {
-                        ctx.save();
-                        ctx.translate(200, 200);
-                        ctx.rotate(timestamp * 0.001);
-                        ctx.fillRect(bx - 200 - 3, by - 200 - 3, 6, 6);
-                        ctx.restore();
-                    } else {
-                        if (levelData && levelData.type === "ROTATED_ANOMALY" && isAnomalySector) {
-                            ctx.fillRect(bx - 3, 400 - by - 3, 6, 6);
-                        } else {
-                            ctx.fillRect(bx - 3, by - 3, 6, 6);
-                        }
-                    }
-                }
+                    localClickBuffer = [];
+                    packetInterval = null;
+                }, 1000);
             }
         }
 
-        function tick(timestamp) {
-            if (!levelData) return;
-            drawMatrixGraphic(ctxA, levelData.seed, false, timestamp);
-            drawMatrixGraphic(ctxB, levelData.seed, true, timestamp);
-            animationFrameId = requestAnimationFrame(tick);
+        function pushToTicker(code) {
+            const staticData = ALL_COUNTRIES.find(c => c.code === code);
+            if (!staticData) return;
+            const item = document.createElement("div");
+            item.className = "feed-item";
+            item.innerText = `${staticData.flag} ${code} CLICKED!`;
+            ticker.appendChild(item);
+            if(ticker.children.length > 5) ticker.children[0].remove();
         }
 
-        canvasA.addEventListener('mousedown', () => { isHoldingMouseOnA = true; });
-        canvasA.addEventListener('mouseup', () => { isHoldingMouseOnA = false; });
+        function handleEventBanner(ev) {
+            const el = document.getElementById("event-banner");
+            if(ev) { el.innerText = ev.text; el.style.display = "block"; } else { el.style.display = "none"; }
+        }
 
-        canvasB.addEventListener('click', async (e) => {
-            const rect = canvasB.getBoundingClientRect();
-            const scaleX = canvasB.width / rect.width;
-            const scaleY = canvasB.height / rect.height;
+        function updateTimer(secs) {
+            const hrs = Math.floor(secs / 3600).toString().padStart(2, '0');
+            const mins = Math.floor((secs % 3600) / 60).toString().padStart(2, '0');
+            const s = (secs % 60).toString().padStart(2, '0');
+            document.getElementById("countdown").innerText = `${hrs}:${mins}:${s}`;
+        }
 
-            const clickX = (e.clientX - rect.left) * scaleX;
-            const clickY = (e.clientY - rect.top) * scaleY;
-
-            try {
-                const response = await fetch(`${API_URL}/api/check`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        idx: currentLevelIndex,
-                        x: Math.round(clickX),
-                        y: Math.round(clickY)
-                    })
+        // ПОИСК И ФИЛЬТРАЦИЯ СТРАН НА КЛИЕНТЕ
+        function buildSelectionList() {
+            const listEl = document.getElementById("select-list");
+            const searchInput = document.getElementById("search-input");
+            
+            const render = (filteredArray) => {
+                listEl.innerHTML = '';
+                filteredArray.forEach(c => {
+                    const d = document.createElement("div"); 
+                    d.className = "select-row";
+                    d.innerHTML = `<span>${c.flag} &nbsp; ${c.name}</span><span style="color:var(--muted); font-size:12px;">${c.code}</span>`;
+                    d.onclick = () => {
+                        userCountry = c.code; 
+                        localStorage.setItem("war_country", c.code);
+                        document.getElementById("welcome-modal").classList.add("hidden");
+                        initGameInterface();
+                    };
+                    listEl.appendChild(d);
                 });
-                const result = await response.json();
+            };
 
-                if (result.success) {
-                    currentLevelIndex++;
-                    loadLevelFromServer();
-                } else {
-                    handleError();
-                }
-            } catch (err) {
-                console.error("Verification failed", err);
-            }
-        });
+            // Первичный рендеринг всех стран
+            render(ALL_COUNTRIES);
 
-        function handleError() {
-            errorCount++;
-            document.getElementById('error-counter').textContent = errorCount;
-            canvasB.classList.add('shake');
-            setTimeout(() => canvasB.classList.remove('shake'), 400);
+            // Обработчик ввода в поисковую строку
+            searchInput.oninput = (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                const filtered = ALL_COUNTRIES.filter(item => 
+                    item.name.toLowerCase().includes(query) || 
+                    item.code.toLowerCase().includes(query)
+                );
+                render(filtered);
+            };
         }
 
-        function showVictory() {
-            document.getElementById('game-screen').classList.remove('active');
-            document.getElementById('victory-screen').classList.add('active');
+        if (!userCountry) {
+            document.getElementById("welcome-modal").classList.remove("hidden");
+            buildSelectionList();
+        } else {
+            initGameInterface();
+        }
+
+        function initGameInterface() {
+            const currentCountryObj = ALL_COUNTRIES.find(c => c.code === userCountry);
+            const printableName = currentCountryObj ? `${currentCountryObj.flag} ${currentCountryObj.name}` : userCountry;
+            document.getElementById("user-status").innerText = `Fighting for ${printableName}`;
+            if(isPremium) clickBtn.classList.add("premium-active");
+            connect();
+        }
+
+        function openSettings() {
+            document.getElementById("settings-modal").classList.remove("hidden");
+            if(!localStorage.getItem("payment_memo")) {
+                localStorage.setItem("payment_memo", 'WAR-' + Math.random().toString(36).substring(2, 7).toUpperCase());
+            }
+            document.getElementById("memo-box").innerText = localStorage.getItem("payment_memo");
+        }
+
+        function simulatePayment() {
+            fetch('/api/webhook/payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ memo: localStorage.getItem("payment_memo"), amount: 0.10 })
+            }).then(() => alert("Boost activated dynamically via webhook!"));
+        }
+
+        function activatePremium() {
+            isPremium = true; 
+            localStorage.setItem("war_premium", "true");
+            clickBtn.classList.add("premium-active");
+            document.getElementById("settings-modal").classList.add("hidden");
+            initGameInterface();
+        }
+
+        function toggleTheme() {
+            const t = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+            if(t === "light") document.documentElement.setAttribute("data-theme", "light");
+            else document.documentElement.removeAttribute("data-theme");
+            localStorage.setItem("theme", t);
+        }
+
+        function resetCountry() {
+            localStorage.removeItem("war_country");
+            window.location.reload();
         }
     </script>
 </body>
