@@ -1,654 +1,326 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AENIGMA MARK 2.3</title>
+    <title>MEMORIA // COGNITIVE MODULE</title>
     <style>
         :root {
-            --bg-color: #050507;
-            --card-bg: #0c0c0e;
-            --accent: #bc9855; 
-            --text-main: #e4e4e7;
-            --text-muted: #52525b;
-            --border: #18181b;
-            --error: #7f1d1d;
-            --success: #15803d;
-            --donate-color: #22c55e;
-            --crypto-accent: #06b6d4; 
+            --bg-color: #040406;
+            --card-bg: #09090b;
+            --accent: #00ff66;
+            --accent-dim: #003311;
+            --error: #ef4444;
+            --text-main: #f3f4f6;
+            --text-muted: #4b5563;
+            --border: #1f2937;
         }
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'Courier New', Courier, monospace; 
-            -webkit-user-select: none; 
-            user-select: none; 
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; -webkit-user-select: none; user-select: none; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 30px 15px; overflow-x: hidden; }
         
-        body {
-            background-color: var(--bg-color); color: var(--text-main); min-height: 100vh;
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 40px 20px;
-            overflow-x: hidden; overflow-y: auto; position: relative;
-        }
-
-        header { 
-            width: 100%; 
-            max-width: 600px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 1px solid var(--border); 
-            padding-bottom: 20px; 
-            flex-shrink: 0; 
-        }
-        .header-stats-group {
-            display: flex;
-            gap: 20px;
-        }
+        header { width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px; }
         .stats { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px; }
         .stats strong { color: var(--accent); }
+
+        main { width: 100%; max-width: 900px; background: var(--card-bg); border: 1px solid var(--border); padding: 40px 20px; border-radius: 4px; box-shadow: 0 25px 60px rgba(0,0,0,0.8); text-align: center; position: relative; }
         
-        main {
-            width: 100%; max-width: 600px; background: var(--card-bg); border: 1px solid var(--border);
-            padding: 50px 40px; border-radius: 2px; box-shadow: 0 30px 60px rgba(0,0,0,0.8); text-align: center; position: relative;
-            margin: 40px 0; display: flex; flex-direction: column; justify-content: center;
-        }
         .screen { display: none; }
         .screen.active { display: block; }
-        h1 { font-size: 1.6rem; letter-spacing: 5px; margin-bottom: 30px; color: #fff; position: relative; z-index: 20; }
-        p { color: var(--text-main); line-height: 1.8; margin-bottom: 35px; font-size: 0.95rem; text-align: justify; position: relative; z-index: 20; }
-        input[type="text"] {
-            width: 100%; background: var(--bg-color); border: 1px solid var(--border); padding: 15px; color: #fff;
-            margin-bottom: 25px; outline: none; text-align: center; letter-spacing: 2px; font-size: 1.1rem;
-            transition: all 0.3s ease; -webkit-user-select: text; user-select: text; position: relative; z-index: 20;
-        }
-        input[type="text"]:focus { border-color: var(--accent); background: #09090b; }
         
-        .btn-container { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: relative; z-index: 20; }
-        .btn {
-            background: none; border: 1px solid var(--accent); color: var(--accent); padding: 15px 35px;
-            cursor: pointer; font-weight: bold; letter-spacing: 3px; transition: all 0.3s; font-size: 0.9rem;
-            touch-action: manipulation;
-        }
-        .btn:hover { background: var(--accent); color: var(--bg-color); box-shadow: 0 0 15px rgba(188, 152, 85, 0.4); }
-        .btn:disabled { border-color: var(--text-muted); color: var(--text-muted); cursor: not-allowed; box-shadow: none; background: none; }
-        .btn.secondary { border-color: var(--text-muted); color: var(--text-muted); }
-        .btn.secondary:hover { background: var(--text-muted); color: var(--bg-color); }
-        
-        .clicker-btn {
-            width: 100px; height: 100px; border-radius: 50%; border: 2px dashed var(--accent); background: none;
-            color: var(--accent); font-size: 2rem; cursor: pointer; margin: 20px auto; display: none;
-            transition: all 0.2s; touch-action: none; position: relative; z-index: 20;
-        }
-        .clicker-btn:active { background: rgba(188, 152, 85, 0.2); transform: scale(0.95); }
-        
-        #void-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; cursor: crosshair; display: none; touch-action: none; pointer-events: none; }
-        
-        .hint-box { display: none; margin-top: 40px; padding-top: 20px; border-top: 1px dashed var(--border); color: var(--text-muted); font-size: 0.8rem; text-align: left; position: relative; z-index: 20; }
-        .hint-box.visible { display: block; }
-        
-        .modal-overlay {
-            display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 7, 0.95);
-            z-index: 1000; justify-content: center; align-items: center; opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: auto; visibility: visible; }
-        .modal-card { background: var(--card-bg); border: 1px solid var(--success); padding: 40px; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 0 30px rgba(21, 128, 61, 0.2); }
-        .modal-card h2 { color: #22c55e; font-size: 1.4rem; letter-spacing: 3px; margin-bottom: 15px; }
-        .modal-card p { margin-bottom: 25px; }
-        
-        .modal-card.donate-card { border-color: var(--donate-color); box-shadow: 0 0 40px rgba(34, 197, 94, 0.25); text-align: left; padding: 35px 30px; }
-        .modal-card.donate-card h2 { color: var(--donate-color); text-align: center; margin-bottom: 25px; }
-        .donate-method-block { margin-bottom: 25px; }
-        .wallet-box { 
-            background: #000; border: 1px dashed #3f3f46; padding: 14px; margin: 10px 0; 
-            font-size: 0.8rem; word-break: break-all; color: #fff; line-height: 1.5;
-            -webkit-user-select: text; user-select: text; letter-spacing: 0.5px;
-        }
-        .donate-notice { color: #f59e0b; font-size: 0.75rem; border-left: 2px solid #f59e0b; padding-left: 12px; margin-top: 20px; line-height: 1.5; }
+        h1 { font-size: 1.6rem; letter-spacing: 5px; margin-bottom: 25px; color: #fff; }
+        p { color: #9ca3af; line-height: 1.8; margin-bottom: 30px; font-size: 0.95rem; text-align: justify; }
 
-        .copy-btn-style {
-            border: 1px solid var(--crypto-accent) !important;
-            color: var(--crypto-accent) !important;
-        }
-        .copy-btn-style:hover {
-            background: rgba(6, 182, 212, 0.1) !important;
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3) !important;
-        }
-
-        .game-info-container { width: 100%; display: flex; gap: 20px; align-items: center; justify-content: center; flex-wrap: wrap; }
+        .matrix-wrapper { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; margin-bottom: 30px; }
+        .matrix-box { display: flex; flex-direction: column; align-items: center; }
+        .matrix-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 2px; font-weight: bold; }
         
-        .floating-like-btn {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 1.1rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-        }
-        .floating-like-btn span {
-            font-size: 0.6rem;
-            margin-top: 2px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            transition: color 0.3s;
-        }
-        .floating-like-btn:hover {
-            border-color: var(--text-muted);
-            color: var(--text-main);
-            background: rgba(24, 24, 27, 0.4);
-        }
-        .floating-like-btn:hover span {
-            color: var(--text-main);
-        }
+        canvas { background: #000000; border: 1px solid var(--border); box-shadow: 0 0 20px rgba(0,0,0,0.5); cursor: crosshair; max-width: 100%; height: auto; }
         
-        .floating-like-btn.liked {
-            border-color: var(--text-main) !important;
-            color: #fff !important;
-            background: var(--card-bg) !important;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.15) !important;
-        }
-        .floating-like-btn.liked span {
-            color: #fff !important;
-        }
-
-        footer { 
-            width: 100%; max-width: 600px; border-top: 1px solid var(--border); margin-top: auto; padding-top: 25px; padding-bottom: 25px; text-align: center; font-size: 0.8rem; color: var(--text-muted); 
-            display: flex; flex-direction: column; align-items: center; gap: 20px; flex-shrink: 0;
-        }
-        .footer-btn-container {
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            width: 100%;
-        }
-        .action-btn { 
-            background: none; 
-            cursor: pointer; 
-            display: inline-flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 6px;
-            font-size: 0.75rem; 
-            font-weight: bold;
-            padding: 8px 0;
-            width: 130px; 
-            letter-spacing: 1px;
-            transition: all 0.3s; 
-            text-decoration: none;
-            border-radius: 2px;
-        }
-        .donate-btn-style { border: 1px solid var(--border); color: var(--text-muted); }
-        .donate-btn-style:hover { border-color: var(--donate-color); color: var(--donate-color); background: rgba(34, 197, 94, 0.05); box-shadow: 0 0 12px rgba(34, 197, 94, 0.2); }
+        .btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 15px 40px; cursor: pointer; font-weight: bold; letter-spacing: 3px; transition: all 0.3s; font-size: 0.9rem; }
+        .btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px rgba(0, 255, 102, 0.5); }
+        .btn:disabled { border-color: var(--text-muted); color: var(--text-muted); cursor: not-allowed; }
 
         .shake { animation: shake 0.4s ease-in-out; border-color: var(--error) !important; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
 
-        @media (max-width: 600px) {
-            body { padding: 20px 15px; }
-            header { width: 100%; }
-            main { margin: 30px 0; padding: 40px 20px; }
-            .header-stats-group { gap: 10px; flex-direction: column; align-items: flex-start; }
-            .floating-like-btn {
-                bottom: 20px;
-                right: 20px;
-                width: 50px;
-                height: 50px;
-                font-size: 1rem;
-            }
-            footer { padding-top: 15px; padding-bottom: 25px; }
-        }
+        footer { margin-top: auto; padding-top: 30px; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="header-stats-group">
-            <div class="stats">ОНЛАЙН: <strong id="online-count">0</strong></div>
-            <div class="stats">ПРОЙДЕНО ЗА 24Ч: <strong id="completed-24-count">0</strong></div>
-        </div>
-        <div class="stats">ПОПЫТКИ:// <strong id="attempt-counter">0</strong>/10</div>
+        <div class="stats">SYSTEM: <strong style="color: #fff;">MEMORIA_M24</strong></div>
+        <div class="stats">ЛИМИТ ОШИБОК: <strong id="error-counter" style="color: var(--error);">0</strong>/5</div>
     </header>
 
-    <main id="main-container">
-        <canvas id="void-canvas"></canvas>
-
+    <main>
+        <!-- СТАРТ -->
         <div id="start-screen" class="screen active">
-            <h1>AENIGMA <span style="color: var(--accent);">[Mark 2.3]</span></h1>
-            <p>Добро пожаловать в 24-уровневый модуль. Уровни 1–15 содержат логические загадки. С 16 по 24 уровень вы входите в «АДСКИЙ СЕКТОР» — древние шифры, чистое интерактивное действие, полное отсутствие подсказок и минимум текста. Нейросети не способны проанализировать этот сектор. Удачи.</p>
-            <button class="btn" onclick="window.startGame()">ИНИЦИАЛИЗАЦИЯ</button>
+            <h1>MEMORIA <span style="color: var(--accent);">[MARK 24]</span></h1>
+            <p>Добро пожаловать в модуль детекции когнитивных искажений. Перед вами 24 уровня технологического превосходства. Ваша задача — находить структурные аномалии в СЕКТОРЕ Б, сравнивая его с чистым эталоном в СЕКТОРЕ А. С каждым слоем защита усложняется: статика сменяется кинетическими вихрями, пульсацией и привязкой к системным часам. Удачи.</p>
+            <button class="btn" onclick="initModule()">ЗАПУСТИТЬ СКАНИРОВАНИЕ</button>
         </div>
 
+        <!-- ИГРОВОЙ ПРОЦЕСС -->
         <div id="game-screen" class="screen">
-            <div class="game-info-container" style="margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed var(--border);">
-                <div class="stats">НА ЭТОМ УРОВНЕ: <strong id="layer-online-count">0</strong></div>
-            </div>
+            <h1 id="level-title">LAYER 01</h1>
+            <p id="level-desc">Загрузка структуры ядра данных...</p>
 
-            <h1 id="level-title">УРОВЕНЬ X</h1>
-            <div id="level-desc" style="white-space: pre-line; line-height: 1.8; margin-bottom: 35px; font-size: 0.95rem; position: relative; z-index: 20;">Загрузка...</div>
-            
-            <button id="clicker-node" class="clicker-btn">⚡</button>
-            <input type="text" id="user-answer" placeholder="ВВЕДИТЕ РЕШЕНИЕ..." autocomplete="off">
-            
-            <div class="btn-container" id="control-block">
-                <button id="sub-btn" class="btn">ОТПРАВИТЬ</button>
-            </div>
-            
-            <div id="hint-box" class="hint-box">
-                <strong>АНАЛИТИЧЕСКИЙ МОДУЛЬ:</strong> <span id="level-hint">...</span>
+            <div class="matrix-wrapper">
+                <div class="matrix-box">
+                    <div class="matrix-label">СЕКТОР А // ORIGINAL</div>
+                    <canvas id="canvas-a" width="400" height="400"></canvas>
+                </div>
+                <div class="matrix-box">
+                    <div class="matrix-label" id="label-b">СЕКТОР Б // ANOMALY</div>
+                    <canvas id="canvas-b" width="400" height="400"></canvas>
+                </div>
             </div>
         </div>
 
+        <!-- ПОБЕДНЫЙ ФИНАЛ -->
         <div id="victory-screen" class="screen">
-            <h1>РЕЖИМ БОГА АКТИВИРОВАН</h1>
-            <p>Невероятно. Вы покорили все 24 уровня, обойдя сектор защиты от ИИ. Вы доказали абсолютное когнитивное превосходство человеческого разума над машинной логикой.</p>
-            <div class="btn-container">
-                <button class="btn" id="restart-btn">ПЕРЕЗАПУСТИТЬ МОДУЛЬ</button>
-                <button class="btn secondary" id="share-btn">СКОПИРОВАТЬ ССЫЛКУ</button>
-            </div>
-            <div class="share-section">
-                <div class="stats" style="margin-top: 25px; margin-bottom: 15px;">БРОСЬТЕ ВЫЗОВ ДРУЗЬЯМ:</div>
-                <div class="qr-frame"><img id="qr-code-img" src="" alt="Загрузка QR..."></div>
-            </div>
+            <h1 style="color: var(--accent);">GOD MODE ENGAGED</h1>
+            <p>Невероятно. Вы успешно прошли все 24 слоя когнитивного протокола «MEMORIA», обойдя динамические ловушки Hell Sector. Ваше внимание неуязвимо для машинных искажений.</p>
+            <button class="btn" onclick="window.location.reload()">ПЕРЕЗАПУСТИТЬ ЯДРО</button>
         </div>
     </main>
 
-    <button id="like-btn" class="floating-like-btn">❤<span id="likes-count">0</span></button>
+    <footer>&copy; 2026 STANISLAV A. // COGNITIVE ANTI-AI INFRASTRUCTURE</footer>
 
-    <div id="success-modal" class="modal-overlay">
-        <div class="modal-card">
-            <h2>ДОСТУП РАЗРЕШЕН</h2>
-            <p id="modal-message">...</p>
-            <button class="btn" id="modal-continue-btn">ПРОДОЛЖИТЬ</button>
-        </div>
-    </div>
-
-    <div id="donate-modal" class="modal-overlay">
-        <div class="modal-card donate-card">
-            <h2>ПОДДЕРЖКА МОДУЛЯ</h2>
-            <p style="text-align: center; margin-bottom: 25px; font-size: 0.85rem; color: var(--text-main);">Выберите удобный способ поддержки проекта:</p>
-            
-            <div class="donate-method-block">
-                <div class="stats">[МЕТОД 01] СБЕРБАНК (RU):</div>
-                <a href="https://messenger.online.sberbank.ru/sl/kzEsbRgBZb6cf7Upy" target="_blank" class="btn" style="display: block; text-align: center; padding: 12px; font-size: 0.8rem; text-decoration: none; border-color: var(--donate-color); color: var(--donate-color); margin-top: 8px;">Открыть СберБанк ₽</a>
-            </div>
-            
-            <div class="donate-method-block">
-                <div class="stats">[МЕТОД 02] КРИПТОВАЛЮТА (TON / USDT):</div>
-                <div class="wallet-box" id="crypto-address">UQB4NY_1ula9p2YJpM0kHPEjbJOmOUK1JNwYUNu9_T2TlAbt</div>
-                <button class="btn copy-btn-style" id="copy-wallet-btn" style="width: 100%; padding: 10px; font-size: 0.8rem; letter-spacing: 1px;">СКОПИРОВАТЬ АДРЕС [ $ / € ]</button>
-            </div>
-            
-            <div class="donate-notice">
-                <strong>ВНИМАНИЕ:</strong> Этот метод оптимизирован для международных переводов. Перед выполнением транзакции убедитесь, что криптовалютные операции разрешены вашим местным законодательством.
-            </div>
-            
-            <div style="text-align: center; margin-top: 30px;">
-                <button class="btn" id="close-donate-btn" style="border-color: var(--text-muted); color: var(--text-muted); padding: 10px 30px; font-size: 0.8rem;">ЗАКРЫТЬ</button>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        <div class="footer-btn-container">
-            <button id="open-donate-btn" class="action-btn donate-btn-style">☕ Поддержать</button>
-        </div>
-        <div>&copy; 2026 Станислав А.</div>
-    </footer>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-        import { getDatabase, ref, onValue, push, onDisconnect, set, runTransaction } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkFTLYk0Jd02thV6DLEzB8hJF-B9IRx68",
-            authDomain: "aenigma-mark-23.firebaseapp.com",
-            databaseURL: "https://aenigma-mark-23-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "aenigma-mark-23", storageBucket: "aenigma-mark-23.firebasestorage.app",
-            messagingSenderId: "318632324088", appId: "1:318632324088:web:c9ff426bac663a64ca840d"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const API_URL = "https://aenigma-server-ru.onrender.com"; 
-
-        const likesRef = ref(db, 'counters/likes');
-        const connectedRef = ref(db, ".info/connected");
-        const onlineUsersRef = ref(db, "online_users");
-        const completed24Ref = ref(db, 'counters/completed24');
-
+    <script>
+        const API_URL = "http://localhost:3000"; // Измените адрес при деплое на хостинг
         let currentLevelIndex = 0;
-        let wrongAttempts = 0;
-        let isSubmitting = false; 
-        let clickPattern = [];
-        let strokePoints = [];
-        let kineticAnimationFrameId = null;
-        let serverLevelData = null;
-        let myUserRef = null;
+        let errorCount = 0;
+        let levelData = null;
+        let animationFrameId = null;
+        let isHoldingMouseOnA = false;
 
-        onValue(likesRef, (snap) => { 
-            document.getElementById('likes-count').innerText = snap.val() || 0; 
-        });
+        const canvasA = document.getElementById('canvas-a');
+        const canvasB = document.getElementById('canvas-b');
+        const ctxA = canvasA.getContext('2d');
+        const ctxB = canvasB.getContext('2d');
 
-        onValue(completed24Ref, (snap) => {
-            document.getElementById('completed-24-count').innerText = snap.val() || 0;
-        });
-
-        document.getElementById('like-btn').addEventListener('click', async () => {
-            const likeBtnEl = document.getElementById('like-btn');
-            if (localStorage.getItem('aenigma_liked')) {
-                likeBtnEl.classList.add('shake');
-                setTimeout(() => likeBtnEl.classList.remove('shake'), 400);
-                return;
-            }
-            likeBtnEl.style.pointerEvents = 'none';
-            try {
-                await runTransaction(likesRef, (currentValue) => (currentValue || 0) + 1);
-                localStorage.setItem('aenigma_liked', 'true');
-                likeBtnEl.classList.add('liked');
-            } catch (err) { 
-                likeBtnEl.classList.add('shake');
-                setTimeout(() => likeBtnEl.classList.remove('shake'), 400);
-            } finally {
-                likeBtnEl.style.pointerEvents = 'auto';
-            }
-        });
-
-        if (localStorage.getItem('aenigma_liked')) {
-            document.getElementById('like-btn').classList.add('liked');
-        }
-
-        const donateModal = document.getElementById('donate-modal');
-        document.getElementById('open-donate-btn').addEventListener('click', () => {
-            donateModal.classList.add('active');
-        });
-        document.getElementById('close-donate-btn').addEventListener('click', () => {
-            donateModal.classList.remove('active');
-        });
-        
-        document.getElementById('copy-wallet-btn').addEventListener('click', () => {
-            const address = document.getElementById('crypto-address').innerText;
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(address).then(() => alert("Адрес кошелька скопирован!")).catch(() => fallbackCopy(address));
-            } else {
-                fallbackCopy(address);
-            }
-        });
-
-        window.updateMyLevelStatus = function(levelIndex) {
-            if (myUserRef) set(myUserRef, { active: true, level: levelIndex });
-        }
-
-        onValue(connectedRef, (snap) => {
-            if (snap.val() === true) {
-                myUserRef = push(onlineUsersRef);
-                set(myUserRef, { active: true, level: -1 });
-                onDisconnect(myUserRef).remove();
-            }
-        });
-
-        onValue(onlineUsersRef, (snap) => {
-            try {
-                const data = typeof snap.val === 'function' ? snap.val() : snap;
-                let totalOnline = 0, layerOnline = 0;
-                if (data) {
-                    const users = Object.values(data);
-                    totalOnline = users.length;
-                    users.forEach(user => { if (user && user.level === currentLevelIndex) layerOnline++; });
-                } 
-                document.getElementById('online-count').innerText = totalOnline;
-                document.getElementById('layer-online-count').innerText = layerOnline;
-            } catch (err) {
-                document.getElementById('online-count').innerText = 1;
-                document.getElementById('layer-online-count').innerText = 1;
-            }
-        });
-
-        window.startGame = function() {
+        function initModule() {
             document.getElementById('start-screen').classList.remove('active');
             document.getElementById('game-screen').classList.add('active');
             loadLevelFromServer();
         }
 
         async function loadLevelFromServer() {
-            if (kineticAnimationFrameId) { cancelAnimationFrame(kineticAnimationFrameId); kineticAnimationFrameId = null; }
-            try {
-                const response = await fetch(`${API_URL}/getLevelData?index=${currentLevelIndex}`);
-                const data = await response.json();
-                if (data.finished) { showVictoryScreen(); return; }
-                serverLevelData = data;
-                window.updateMyLevelStatus(currentLevelIndex);
-
-                document.getElementById('level-title').textContent = data.title;
-                document.getElementById('level-desc').innerHTML = data.desc;
-                document.getElementById('level-hint').textContent = data.hint;
-                
-                const inputField = document.getElementById('user-answer');
-                const clickBtn = document.getElementById('clicker-node');
-                const ctrlBlock = document.getElementById('control-block');
-                const canvas = document.getElementById('void-canvas');
-
-                inputField.style.display = 'block'; inputField.value = '';
-                clickBtn.style.display = 'none'; ctrlBlock.style.display = 'flex';
-                canvas.style.display = 'none'; canvas.style.pointerEvents = 'none'; 
-                
-                if (currentLevelIndex !== 23) {
-                    wrongAttempts = 0;
-                    document.getElementById('attempt-counter').textContent = "0";
-                }
-                document.getElementById('hint-box').classList.remove('visible');
-
-                if (data.type === "DYNAMIC") {
-                    inputField.style.display = 'block'; ctrlBlock.style.display = 'flex'; clickBtn.style.display = 'none';
-                }
-                if (data.type === "CLICKER") {
-                    inputField.style.display = 'none'; ctrlBlock.style.display = 'none'; clickBtn.style.display = 'block';
-                    setupClicker();
-                }
-                if (data.type === "CANVAS") {
-                    inputField.style.display = 'none'; ctrlBlock.style.display = 'none'; canvas.style.display = 'block';
-                    canvas.style.pointerEvents = 'auto'; 
-                    setupCanvas();
-                }
-                if (currentLevelIndex >= 15 && data.type !== "CANVAS") { 
-                    canvas.style.display = 'block'; canvas.style.pointerEvents = 'none'; 
-                    setupKineticGhost();
-                }
-                if (inputField.style.display !== 'none') inputField.focus();
-                isSubmitting = false;
-                document.getElementById('sub-btn').disabled = false;
-            } catch (err) { 
-                isSubmitting = false;
-                document.getElementById('sub-btn').disabled = false;
-            }
-        }
-
-        async function submitAnswer() {
-            if (isSubmitting) return;
-            const inputField = document.getElementById('user-answer');
-            if (inputField.style.display === 'none') return;
-            if (inputField.value.trim() === "") return;
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
             
-            isSubmitting = true;
-            document.getElementById('sub-btn').disabled = true;
-
-            if (currentLevelIndex === 23) {
-                await sendAnswerToServer(inputField.value, { currentAttempts: wrongAttempts });
-            } else {
-                await sendAnswerToServer(inputField.value);
-            }
-        }
-
-        async function sendAnswerToServer(answerString, rawData = null) {
             try {
-                const response = await fetch(`${API_URL}/checkAnswer`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ index: currentLevelIndex, answer: answerString, rawData: rawData })
-                });
-                const result = await response.json();
-                if (result.success) triggerSuccess(); else triggerFail();
-            } catch (err) { 
-                triggerFail();
-            }
-        }
+                const response = await fetch(`${API_URL}/api/level?idx=${currentLevelIndex}`);
+                levelData = await response.json();
 
-        function triggerSuccess() {
-            document.getElementById('modal-message').textContent = `Уровень ${currentLevelIndex + 1} успешно взломан. Продолжение инфильтрации...`;
-            document.getElementById('success-modal').classList.add('active');
-        }
-
-        function triggerFail() {
-            const el = document.getElementById('user-answer').style.display !== 'none' ? document.getElementById('user-answer') : document.getElementById('clicker-node');
-            el.classList.add('shake'); setTimeout(() => el.classList.remove('shake'), 400);
-            wrongAttempts++; 
-            document.getElementById('attempt-counter').textContent = wrongAttempts;
-            if (wrongAttempts >= 10 && currentLevelIndex < 15) document.getElementById('hint-box').classList.add('visible');
-            isSubmitting = false;
-            document.getElementById('sub-btn').disabled = false;
-        }
-
-        function nextLevel() {
-            document.getElementById('success-modal').classList.remove('active');
-            currentLevelIndex++; 
-            loadLevelFromServer();
-        }
-
-        async function showVictoryScreen() {
-            document.getElementById('void-canvas').style.display = 'none';
-            document.getElementById('clicker-node').style.display = 'none';
-            document.getElementById('game-screen').classList.remove('active');
-            document.getElementById('victory-screen').classList.add('active');
-            generateQR();
-            window.updateMyLevelStatus(99); 
-            try {
-                await runTransaction(completed24Ref, (currentValue) => (currentValue || 0) + 1);
-            } catch(e) {}
-        }
-
-        function setupClicker() {
-            clickPattern = [];
-            const clickBtn = document.getElementById('clicker-node');
-            let lastClickTime = 0;
-            clickBtn.onmousedown = clickBtn.ontouchstart = (e) => { e.preventDefault(); lastClickTime = Date.now(); };
-            clickBtn.onmouseup = clickBtn.ontouchend = async (e) => {
-                e.preventDefault();
-                const duration = Date.now() - lastClickTime;
-                clickPattern.push(duration);
-                if (clickPattern.length > 9) clickPattern.shift();
-                if (clickPattern.length === 9) {
-                    await sendAnswerToServer(null, { timings: clickPattern });
-                    clickPattern = [];
+                if (levelData.finished) {
+                    showVictory();
+                    return;
                 }
-            };
+
+                document.getElementById('level-title').textContent = levelData.title;
+                document.getElementById('level-desc').textContent = levelData.desc;
+                
+                // Перезапуск цикла анимации/отрисовки графики на Canvas
+                tick();
+            } catch (err) {
+                console.error("Критический сбой связи с ядром бэкенда", err);
+            }
         }
 
-        function setupCanvas() {
-            const canvas = document.getElementById('void-canvas');
-            const ctx = canvas.getContext('2d');
-            let drawing = false;
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            ctx.clearRect(0,0, canvas.width, canvas.height);
+        // Математический генератор абстрактных миров на базе Seed
+        function drawMatrixGraphic(ctx, seed, isAnomalySector, timestamp) {
+            ctx.clearRect(0, 0, 400, 400);
+            
+            // Задний фон - матричный шум
+            ctx.fillStyle = "rgba(0, 20, 5, 0.15)";
+            for (let i = 0; i < 15; i++) {
+                let gx = Math.abs(Math.sin(seed + i)) * 400;
+                let gy = (timestamp * (0.1 + i * 0.02)) % 400;
+                ctx.fillRect(gx, gy, 1, 15);
+            }
 
-            canvas.onmousedown = canvas.ontouchstart = (e) => { e.preventDefault(); drawing = true; strokePoints = []; };
-            canvas.onmouseup = canvas.ontouchend = async (e) => { 
-                e.preventDefault(); drawing = false; 
-                if (strokePoints.length > 3) await sendAnswerToServer(null, { points: strokePoints, width: canvas.width });
-            };
-            canvas.onmousemove = canvas.ontouchmove = (e) => {
-                if (!drawing) return; e.preventDefault();
-                const rect = canvas.getBoundingClientRect();
-                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-                const pt = { x: Math.round(clientX - rect.left), y: Math.round(clientY - rect.top) };
-                strokePoints.push(pt);
-                ctx.fillStyle = '#bc9855'; ctx.fillRect(pt.x, pt.y, 4, 4);
-            };
-        }
+            // Основная геометрия объектов
+            let nodesCount = 60;
+            ctx.fillStyle = "#ffffff";
+            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.lineWidth = 1;
 
-        function setupKineticGhost() {
-            const canvas = document.getElementById('void-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight; 
-            const letters = ["V", "O", "R", "T", "E", "X"];
+            let anomalyX = 0, anomalyY = 0;
 
-            function processFrame() {
-                if (currentLevelIndex < 15) return;
-                ctx.fillStyle = 'rgba(12, 12, 14, 0.2)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                const time = performance.now();
+            // Вычисляем координаты аномалии в зависимости от типа уровня
+            if (levelData.type === "DYNAMIC_ORBIT") {
+                const angle = (timestamp / 1000) % (Math.PI * 2);
+                anomalyX = 200 + Math.sin(angle) * 100;
+                anomalyY = 200 + Math.cos(angle) * 100;
+            } else if (levelData.type === "DYNAMIC_TIME" || levelData.type === "DYNAMIC_FINAL") {
+                anomalyX = 50 + (levelData.timeMinutes * 4) % 300;
+                anomalyY = 50 + (levelData.timeMinutes * 3) % 300;
+            }
 
-                if (currentLevelIndex === 22) {
-                    const interval = 3000;
-                    const currentLetterIdx = Math.floor((time / interval) % letters.length);
-                    const totalLetters = letters.length;
-                    const rectWidth = 50, rectHeight = 60, gap = 15;
-                    const totalWidth = (rectWidth * totalLetters) + (gap * (totalLetters - 1));
-                    const startX = (canvas.width - totalWidth) / 2;
-                    const startY = (canvas.height - rectHeight) / 2 - 20;
+            for (let i = 0; i < nodesCount; i++) {
+                // Псевдогенерация стабильных координат по зерну математики
+                let bx = Math.abs(Math.sin(seed * 1.5 + i)) * 320 + 40;
+                let by = Math.abs(Math.cos(seed * 2.8 + i)) * 320 + 40;
 
-                    for (let i = 0; i < totalLetters; i++) {
-                        const x = startX + i * (rectWidth + gap);
-                        if (i === currentLetterIdx) {
-                            ctx.strokeStyle = '#bc9855'; ctx.lineWidth = 2; ctx.strokeRect(x, startY, rectWidth, rectHeight);
-                            for (let s = 0; s < 40; s++) { ctx.fillStyle = `rgba(188, 152, 85, ${Math.random() * 0.7})`; ctx.fillRect(x + Math.random() * rectWidth, startY + Math.random() * rectHeight, 2, 2); }
-                            ctx.fillStyle = '#fff'; ctx.font = 'bold 28px "Courier New"'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                            ctx.fillText(letters[i], x + (rectWidth / 2) + (Math.random() * 4 - 2), startY + (rectHeight / 2));
+                // Базовые статические связки
+                if (i > 0 && i % 4 === 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(bx, by);
+                    ctx.lineTo(200, 200);
+                    ctx.stroke();
+                }
+
+                // Элемент №23 выбран в качестве носителя аномалии на сервере
+                if (i === 23 && isAnomalySector) {
+                    ctx.save();
+                    
+                    // Отрисовка согласно усложненным правилам уровня
+                    switch (levelData.type) {
+                        case "STATIC_COLOR":
+                            ctx.fillStyle = "#00ff66"; // Изменился цвет узла
+                            ctx.fillRect(215, 78, 8, 8);
+                            break;
+                        case "STATIC_DISPLACE":
+                            ctx.fillRect(142, 290, 7, 7); // Узел сдвинулся
+                            break;
+                        case "STATIC_SCALE":
+                            ctx.fillRect(310, 180, 15, 15); // Масштаб изменен
+                            break;
+                        case "STATIC_MISSING":
+                            // Ничего не рисуем, узел просто исчез!
+                            break;
+                        case "ROTATED_ANOMALY":
+                            ctx.fillStyle = "#ff3333";
+                            ctx.fillRect(200, 90, 8, 8);
+                            break;
+                        case "DYNAMIC_ORBIT":
+                            ctx.fillStyle = "#00ff66";
+                            ctx.beginPath(); ctx.arc(anomalyX, anomalyY, 5, 0, Math.PI*2); ctx.fill();
+                            break;
+                        case "DYNAMIC_PULSE":
+                            // Появляется раз в 2 секунды
+                            if (Math.floor(timestamp / 1000) % 2 === 0) {
+                                ctx.fillRect(130, 130, 6, 6);
+                            }
+                            break;
+                        case "DYNAMIC_TIME":
+                            ctx.fillStyle = "#00ff66";
+                            ctx.fillRect(anomalyX, anomalyY, 7, 7);
+                            break;
+                        case "DYNAMIC_GLITCH":
+                            // Мерцание координат
+                            let ox = 280 + (Math.random() * 6 - 3);
+                            ctx.fillRect(ox, 140, 6, 6);
+                            break;
+                        case "DYNAMIC_VORTEX":
+                            ctx.translate(200, 200);
+                            ctx.rotate(timestamp * 0.001);
+                            ctx.fillRect(0, 0, 8, 8); // Истинный центр неподвижен на 200,200
+                            break;
+                        case "DYNAMIC_HOLD":
+                            if (isHoldingMouseOnA) ctx.fillStyle = "#ff3333";
+                            ctx.fillRect(100, 300, 6, 6);
+                            break;
+                        case "DYNAMIC_COLOR_LOOP":
+                            let hue = (timestamp / 10) % 360;
+                            ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+                            ctx.fillRect(310, 320, 8, 8);
+                            break;
+                        case "DYNAMIC_PHANTOM":
+                            if (Math.random() < 0.05) ctx.fillRect(220, 110, 6, 6);
+                            break;
+                        case "DYNAMIC_FINAL":
+                            ctx.fillStyle = (Math.random() > 0.5) ? "#fff" : "#00ff66";
+                            ctx.fillRect(anomalyX + (Math.random()*4-2), anomalyY, 8, 8);
+                            break;
+                    }
+                    ctx.restore();
+                } else {
+                    // Рисуем дефолтные идентичные узлы для обоих секторов
+                    if (levelData && levelData.type === "DYNAMIC_VORTEX" && isAnomalySector) {
+                        ctx.save();
+                        ctx.translate(200, 200);
+                        ctx.rotate(timestamp * 0.001);
+                        ctx.fillRect(bx - 200, by - 200, 6, 6);
+                        ctx.restore();
+                    } else {
+                        // Стандартная ветка
+                        if (levelData && levelData.type === "ROTATED_ANOMALY" && isAnomalySector) {
+                            // Отражение по вертикали для усложнения
+                            ctx.fillRect(bx, 400 - by, 6, 6);
                         } else {
-                            ctx.strokeStyle = '#18181b'; ctx.lineWidth = 1; ctx.strokeRect(x, startY, rectWidth, rectHeight);
+                            ctx.fillRect(bx, by, 6, 6);
                         }
                     }
-                } else {
-                    for (let i = 0; i < 350; i++) {
-                        ctx.fillStyle = `rgba(188, 152, 85, ${Math.random() * 0.12})`;
-                        ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 1.5, Math.random() * 1.5);
-                    }
                 }
-                kineticAnimationFrameId = requestAnimationFrame(processFrame);
             }
-            processFrame();
         }
 
-        function getCleanUrl() { return window.location.href.startsWith('file://') ? 'https://google.com' : window.location.href; }
-        function generateQR() { try { document.getElementById('qr-code-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(getCleanUrl())}&color=bc9855&bgcolor=0c0c0e`; } catch(e){} }
-        function copyShareLink() {
-            const u = window.location.href;
-            if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(u).then(() => alert("Ссылка на игру скопирована!")).catch(() => fallbackCopy(u)); } else fallbackCopy(u);
-        }
-        function fallbackCopy(t) { const ta = document.createElement("textarea"); ta.value = t; ta.style.position = "fixed"; document.body.appendChild(ta); ta.focus(); ta.select(); try { document.execCommand('copy'); alert("Ссылка на игру скопирована!"); } catch (e) {} document.body.removeChild(ta); }
-        
-        function resetGame() { 
-            currentLevelIndex = 0; wrongAttempts = 0; isSubmitting = false; 
-            document.getElementById('sub-btn').disabled = false;
-            document.getElementById('victory-screen').classList.remove('active'); 
-            document.getElementById('start-screen').classList.add('active'); 
-            window.updateMyLevelStatus(-1);
+        function tick(timestamp) {
+            if (!levelData) return;
+            
+            // Рендерим Сектор А
+            drawMatrixGraphic(ctxA, levelData.seed, false, timestamp);
+            // Рендерим Сектор Б
+            drawMatrixGraphic(ctxB, levelData.seed, true, timestamp);
+
+            animationFrameId = requestAnimationFrame(tick);
         }
 
-        document.getElementById('sub-btn').addEventListener('click', submitAnswer);
-        document.getElementById('modal-continue-btn').addEventListener('click', nextLevel);
-        document.getElementById('restart-btn').addEventListener('click', resetGame);
-        document.getElementById('share-btn').addEventListener('click', copyShareLink);
-        document.getElementById('user-answer').addEventListener('keydown', async (e) => { 
-            if (e.key === 'Enter') { 
-                if (document.getElementById('success-modal').classList.contains('active')) nextLevel(); 
-                else await submitAnswer(); 
-            } 
+        // Фиксация удержания мыши на Секторе А для LAYER 21
+        canvasA.addEventListener('mousedown', () => { isHoldingMouseOnA = true; });
+        canvasA.addEventListener('mouseup', () => { isHoldingMouseOnA = false; });
+
+        // Логика клика по Сектору Б и отправка координат на валидацию сервера
+        canvasB.addEventListener('click', async (e) => {
+            const rect = canvasB.getBoundingClientRect();
+            const scaleX = canvasB.width / rect.width;
+            const scaleY = canvasB.height / rect.height;
+
+            const clickX = (e.clientX - rect.left) * scaleX;
+            const clickY = (e.clientY - rect.top) * scaleY;
+
+            try {
+                const response = await fetch(`${API_URL}/api/check`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idx: currentLevelIndex,
+                        x: Math.round(clickX),
+                        y: Math.round(clickY)
+                    })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    currentLevelIndex++;
+                    loadLevelFromServer();
+                } else {
+                    handleError();
+                }
+            } catch (err) {
+                console.error("Ошибка верификации клика", err);
+            }
         });
+
+        function handleError() {
+            errorCount++;
+            document.getElementById('error-counter').textContent = errorCount;
+            canvasB.classList.add('shake');
+            setTimeout(() => canvasB.classList.remove('shake'), 400);
+
+            if (errorCount >= 5) {
+                alert("КРИТИЧЕСКОЕ ИСКАЖЕНИЕ РАЗУМА. МОДУЛЬ ПЕРЕЗАПУСКАЕТСЯ.");
+                window.location.reload();
+            }
+        }
+
+        function showVictory() {
+            document.getElementById('game-screen').classList.remove('active');
+            document.getElementById('victory-screen').classList.add('active');
+        }
     </script>
 </body>
 </html>
