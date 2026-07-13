@@ -52,12 +52,14 @@
     </header>
 
     <main>
+        <!-- START SCREEN -->
         <div id="start-screen" class="screen active">
             <h1>MEMORIA <span style="color: var(--accent);">[MARK 24]</span></h1>
             <p>Welcome to the Cognitive Distortion Detection Module. You are presented with 24 layers of architectural data streams. Your primary objective is to locate structural anomalies in SECTOR B by comparing it with the clean baseline template in SECTOR A. With each level, the system defenses escalate: static shifts turn into kinetic matrix orbits, high-frequency pulses, and server time-locks. Good luck.</p>
             <button class="btn" onclick="initModule()">INITIALIZE SCAN</button>
         </div>
 
+        <!-- GAMEPLAY SCREEN -->
         <div id="game-screen" class="screen">
             <h1 id="level-title">LAYER 01</h1>
             <p id="level-desc">Loading core data structure streams...</p>
@@ -74,6 +76,7 @@
             </div>
         </div>
 
+        <!-- VICTORY SCREEN -->
         <div id="victory-screen" class="screen">
             <h1 style="color: var(--accent);">GOD MODE ENGAGED</h1>
             <p>Unbelievable. You conquered all 24 layers of the 'MEMORIA' protocol, successfully bypassing all dynamic cognitive traps of the Hell Sector. Your perception remains absolutely dominant over machine distortions.</p>
@@ -84,10 +87,8 @@
     <footer>&copy; 2026 STANISLAV A. // COGNITIVE ANTI-AI INFRASTRUCTURE</footer>
 
     <script>
-        // Automatic host fallback logic to prevent loading deadlocks
-        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-            ? 'http://localhost:3000' 
-            : window.location.origin.replace('//file:', 'http://localhost:3000'); 
+        // Bound directly to your live Render server instance
+        const API_URL = "https://aenigma-server-ru.onrender.com"; 
 
         let currentLevelIndex = 0;
         let errorCount = 0;
@@ -123,7 +124,7 @@
                 
                 tick();
             } catch (err) {
-                document.getElementById('level-desc').innerHTML = "<span style='color:var(--error);'>CRITICAL INTERFACE ERROR: Cannot bind to server backend core. Ensure server.js is active on port 3000.</span>";
+                document.getElementById('level-desc').innerHTML = "<span style='color:var(--error);'>CRITICAL INTERFACE ERROR: Connection to Render backend core lost. Verify web service deployment status.</span>";
             }
         }
 
