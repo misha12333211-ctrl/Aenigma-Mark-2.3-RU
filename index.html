@@ -48,18 +48,16 @@
 
     <header>
         <div class="stats">SYSTEM: <strong style="color: #fff;">MEMORIA_M24</strong></div>
-        <div class="stats">ERROR MATRIX: <strong id="error-counter" style="color: var(--error);">0</strong>/5</div>
+        <div class="stats">TOTAL MISCLICKS: <strong id="error-counter" style="color: var(--error);">0</strong></div>
     </header>
 
     <main>
-        <!-- START SCREEN -->
         <div id="start-screen" class="screen active">
             <h1>MEMORIA <span style="color: var(--accent);">[MARK 24]</span></h1>
             <p>Welcome to the Cognitive Distortion Detection Module. You are presented with 24 layers of architectural data streams. Your primary objective is to locate structural anomalies in SECTOR B by comparing it with the clean baseline template in SECTOR A. With each level, the system defenses escalate: static shifts turn into kinetic matrix orbits, high-frequency pulses, and server time-locks. Good luck.</p>
             <button class="btn" onclick="initModule()">INITIALIZE SCAN</button>
         </div>
 
-        <!-- GAMEPLAY SCREEN -->
         <div id="game-screen" class="screen">
             <h1 id="level-title">LAYER 01</h1>
             <p id="level-desc">Loading core data structure streams...</p>
@@ -76,7 +74,6 @@
             </div>
         </div>
 
-        <!-- VICTORY SCREEN -->
         <div id="victory-screen" class="screen">
             <h1 style="color: var(--accent);">GOD MODE ENGAGED</h1>
             <p>Unbelievable. You conquered all 24 layers of the 'MEMORIA' protocol, successfully bypassing all dynamic cognitive traps of the Hell Sector. Your perception remains absolutely dominant over machine distortions.</p>
@@ -170,45 +167,45 @@
                     switch (levelData.type) {
                         case "STATIC_COLOR":
                             ctx.fillStyle = "#00ff66";
-                            ctx.fillRect(215, 78, 8, 8);
+                            ctx.fillRect(215 - 1, 78 - 1, 10, 10);
                             break;
                         case "STATIC_DISPLACE":
                             ctx.fillRect(142, 290, 7, 7);
                             break;
                         case "STATIC_SCALE":
-                            ctx.fillRect(310, 180, 15, 15);
+                            ctx.fillRect(310 - 4, 180 - 4, 15, 15);
                             break;
                         case "STATIC_MISSING":
                             break;
                         case "ROTATED_ANOMALY":
                             ctx.fillStyle = "#ff3333";
-                            ctx.fillRect(200, 90, 8, 8);
+                            ctx.fillRect(200 - 1, 90 - 1, 10, 10);
                             break;
                         case "DYNAMIC_ORBIT":
                             ctx.fillStyle = "#00ff66";
-                            ctx.beginPath(); ctx.arc(anomalyX, anomalyY, 5, 0, Math.PI*2); ctx.fill();
+                            ctx.beginPath(); ctx.arc(anomalyX, anomalyY, 6, 0, Math.PI*2); ctx.fill();
                             break;
                         case "DYNAMIC_PULSE":
                             if (Math.floor(timestamp / 1000) % 2 === 0) {
-                                ctx.fillRect(130, 130, 6, 6);
+                                ctx.fillRect(130, 130, 8, 8);
                             }
                             break;
                         case "DYNAMIC_TIME":
                             ctx.fillStyle = "#00ff66";
-                            ctx.fillRect(anomalyX, anomalyY, 7, 7);
+                            ctx.fillRect(anomalyX, anomalyY, 8, 8);
                             break;
                         case "DYNAMIC_GLITCH":
                             let ox = 280 + (Math.random() * 6 - 3);
-                            ctx.fillRect(ox, 140, 6, 6);
+                            ctx.fillRect(ox, 140, 8, 8);
                             break;
                         case "DYNAMIC_VORTEX":
                             ctx.translate(200, 200);
                             ctx.rotate(timestamp * 0.001);
-                            ctx.fillRect(0, 0, 8, 8);
+                            ctx.fillRect(-4, -4, 8, 8);
                             break;
                         case "DYNAMIC_HOLD":
                             if (isHoldingMouseOnA) ctx.fillStyle = "#ff3333";
-                            ctx.fillRect(100, 300, 6, 6);
+                            ctx.fillRect(100, 300, 8, 8);
                             break;
                         case "DYNAMIC_COLOR_LOOP":
                             let hue = (timestamp / 10) % 360;
@@ -216,7 +213,7 @@
                             ctx.fillRect(310, 320, 8, 8);
                             break;
                         case "DYNAMIC_PHANTOM":
-                            if (Math.random() < 0.05) ctx.fillRect(220, 110, 6, 6);
+                            if (Math.random() < 0.05) ctx.fillRect(220, 110, 8, 8);
                             break;
                         case "DYNAMIC_FINAL":
                             ctx.fillStyle = (Math.random() > 0.5) ? "#fff" : "#00ff66";
@@ -229,13 +226,13 @@
                         ctx.save();
                         ctx.translate(200, 200);
                         ctx.rotate(timestamp * 0.001);
-                        ctx.fillRect(bx - 200, by - 200, 6, 6);
+                        ctx.fillRect(bx - 200 - 3, by - 200 - 3, 6, 6);
                         ctx.restore();
                     } else {
                         if (levelData && levelData.type === "ROTATED_ANOMALY" && isAnomalySector) {
-                            ctx.fillRect(bx, 400 - by, 6, 6);
+                            ctx.fillRect(bx - 3, 400 - by - 3, 6, 6);
                         } else {
-                            ctx.fillRect(bx, by, 6, 6);
+                            ctx.fillRect(bx - 3, by - 3, 6, 6);
                         }
                     }
                 }
@@ -288,11 +285,6 @@
             document.getElementById('error-counter').textContent = errorCount;
             canvasB.classList.add('shake');
             setTimeout(() => canvasB.classList.remove('shake'), 400);
-
-            if (errorCount >= 5) {
-                alert("CRITICAL COGNITIVE OVERLOAD. PROTOCOL REBOOTING.");
-                window.location.reload();
-            }
         }
 
         function showVictory() {
